@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import streamlit as st
 import random
 
@@ -53,8 +52,8 @@ if col_retry.button("もう１回勝負！"):
 # スコアをリセット
 if col_reset.button("スコアをリセット"): 
     st.session_state.win_count = 0
-    st.rerun() # 0に戻した後に画面をリフレッシュS
-=======
+    st.rerun() # 0に戻した後に画面をリフレッシュ
+
 import streamlit as st
 import random
 

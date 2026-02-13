@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import streamlit as st
 import random
 
@@ -20,7 +19,6 @@ if st.button("おみくじを引く"):
     # 演出
     st.balloons()
     st.success(f"結果は... **{result}** です！")
-=======
 import streamlit as st
 import random
 
@@ -42,4 +40,3 @@ if st.button("おみくじを引く"):
     # 演出
     st.balloons()
     st.success(f"結果は... **{result}** です！")
->>>>>>> 9c3b2e7e14b752914c849225a6be5faa6987c9ab
