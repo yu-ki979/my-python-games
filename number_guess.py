@@ -6,10 +6,10 @@ st.title("🔢 1/1000のキセキ")
 
 # 答えの数字を準備（まだなければ作成）
 if "target" not in st.session_state:
-    st.session_state.target = random.randint(1, 100)
+    st.session_state.target = random.randint(1, 1000)
     st.session_state.count = 0
 
-st.write("１から１００の間で数字を当ててね！")
+st.write("１から１０００の間で数字を当ててね！")
 
 # 入力ホームを作る
 guess = st.number_input("予想した数字", min_value=1, max_value=100)
