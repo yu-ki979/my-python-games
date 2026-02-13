@@ -33,3 +33,10 @@ if st.button("予想する"):
     else:
         st.success(f"大正解！天才かよ！ 🎉 {st.session_state.count}回目で正解しました！")
         st.balloons()
+
+# リプレイボタン
+if st.button("もう１度遊ぶ"):
+    # セッションの中身を消して、最初の状態に戻す
+    st.session_state.clear()
+    # 画面を再読読み込みする
+    st.rerun()
