@@ -18,10 +18,18 @@ guess = st.number_input("予想した数字", min_value=1, max_value=1000)
 if st.button("予想する"):
     st.session_state.count += 1
 
+    # 差を計算する
+    diff = abs(guess - st.session_state.target)
     if guess < st.session_state.target:
-        st.warning("全然足りないよ！もっと上 ⬆️")
+        if diff <= 5:
+            st.warning("うわ～！あとちょっと！あと少しだけ上！ 🤏")
+        else:
+            st.warning("全然足りないよ！もっと上 ⬆️")
     elif guess > st.session_state.target:
-        st.warning("行き過ぎ！戻ってきて ⬇️")
+        if diff <= 5:
+            st.warning("惜しい！あとちょっとだけ下！ 🤏")
+        else:
+            st.warning("行き過ぎ！戻ってきて ⬇️")
     else:
-        st.success(f"天才かよ！正解！ 🎉 {st.session_state.count}回目で正解しました！")
+        st.success(f"大正解！天才かよ！ 🎉 {st.session_state.count}回目で正解しました！")
         st.balloons()
