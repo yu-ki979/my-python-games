@@ -109,5 +109,5 @@ if col_retry.button("もう１回勝負！"):
 # スコアをリセット
 if col_reset.button("スコアをリセット"): 
     st.session_state.win_count = 0
-    st.rerun() # 0に戻した後に画面をリフレッシュS
->>>>>>> 9c3b2e7e14b752914c849225a6be5faa6987c9ab
+    st.rerun() # 0に戻した後に画面をリフレッシュ
+
