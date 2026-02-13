@@ -12,7 +12,7 @@ if "target" not in st.session_state:
 st.write("１から１０００の間で数字を当ててね！")
 
 # 入力ホームを作る
-guess = st.number_input("予想した数字", min_value=1, max_value=100)
+guess = st.number_input("予想した数字", min_value=1, max_value=1000)
 
 # ボタンが押された時の処理
 if st.button("予想する"):
