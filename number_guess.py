@@ -2,7 +2,7 @@ import streamlit as st
 import random
 
 # タイトルを表示
-st.title("🔢 数当てゲーム")
+st.title("🔢 1/1000のキセキ")
 
 # 答えの数字を準備（まだなければ作成）
 if "target" not in st.session_state:
@@ -19,9 +19,9 @@ if st.button("予想する"):
     st.session_state.count += 1
 
     if guess < st.session_state.target:
-        st.warning("もっと大きいよ！ ⬆️")
+        st.warning("全然足りないよ！もっと上 ⬆️")
     elif guess > st.session_state.target:
-        st.warning("もっと小さいよ！ ⬇️")
+        st.warning("行き過ぎ！戻ってきて ⬇️")
     else:
-        st.success(f"正解！ 🎉 {st.session_state.count}回目で正解しました！")
+        st.success(f"天才かよ！正解！ 🎉 {st.session_state.count}回目で正解しました！")
         st.balloons()
