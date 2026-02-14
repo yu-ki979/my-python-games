@@ -3,7 +3,8 @@ import random
 
 # タイトルを表示
 st.title("🔢 1/1000のキセキ")
-
+if st.session_state.best_score != float("inf"):
+    st.sidebar.metric("🏆 自己ベスト", f"{st.session_state.best_score}回")
 # 答えの数字を準備（まだなければ作成）
 if "target" not in st.session_state:
     st.session_state.target = random.randint(1, 1000)
@@ -55,7 +56,9 @@ if st.session_state.history:
     st.info(",".join(map(str, st.session_state.history)))
 # リプレイボタン
 if st.button("もう１度遊ぶ"):
-    # セッションの中身を消して、最初の状態に戻す
-    st.session_state.clear()
+    # 全消しせず特定のデータだけ上書き
+    st.session_state.target = random.randint(1, 1000) # 新しい正解
+    st.session_state.count = 0 # 回数を0に
+    st.session_state.history = [] # 履歴を空に    
     # 画面を再読読み込みする
     st.rerun()
