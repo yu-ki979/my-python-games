@@ -8,6 +8,8 @@ st.title("🔢 1/1000のキセキ")
 if "target" not in st.session_state:
     st.session_state.target = random.randint(1, 1000)
     st.session_state.count = 0
+    # 履歴を入れる「空のリスト」を作る
+    st.session_state.history = []
 
 st.write("１から１０００の間で数字を当ててね！")
 
@@ -34,6 +36,12 @@ if st.button("予想する"):
         st.success(f"大正解！天才かよ！ 🎉 {st.session_state.count}回目で正解しました！")
         st.balloons()
 
+# 履歴を画面に表示する
+if st.session_state.history:
+    st.write("---")
+    st.subheader("📝 あなたがこれまでに予想した数字")
+    # 履歴を横並びに
+    st.info(",".join(map(str, st.session_state.history)))
 # リプレイボタン
 if st.button("もう１度遊ぶ"):
     # セッションの中身を消して、最初の状態に戻す
