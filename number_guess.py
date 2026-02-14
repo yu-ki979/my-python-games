@@ -3,17 +3,19 @@ import random
 
 # タイトルを表示
 st.title("🔢 1/1000のキセキ")
+
+if "best_score" not in st.session_state:
+    st.session_state.best_score = float("inf") # 最初は無限大にしておく
+# ベストスコアがあれば表示する    
 if st.session_state.best_score != float("inf"):
     st.sidebar.metric("🏆 自己ベスト", f"{st.session_state.best_score}回")
+    
 # 答えの数字を準備（まだなければ作成）
 if "target" not in st.session_state:
     st.session_state.target = random.randint(1, 1000)
     st.session_state.count = 0
     # 履歴を入れる「空のリスト」を作る
     st.session_state.history = []
-
-if "best_score" not in st.session_state:
-    st.session_state.best_score = float("inf") # 最初は無限大にしておく
 
 st.write("１から１０００の間で数字を当ててね！")
 
