@@ -19,6 +19,8 @@ guess = st.number_input("予想した数字", min_value=1, max_value=1000)
 # ボタンが押された時の処理
 if st.button("予想する"):
     st.session_state.count += 1
+    # 入力した数字を履歴リストに追加
+    st.session_state.history.append(guess)
 
     # 差を計算する
     diff = abs(guess - st.session_state.target)
