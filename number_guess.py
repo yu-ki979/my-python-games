@@ -8,7 +8,14 @@ if "best_score" not in st.session_state:
     st.session_state.best_score = float("inf") # 最初は無限大にしておく
 # ベストスコアがあれば表示する    
 if st.session_state.best_score != float("inf"):
-    st.sidebar.metric("🏆 自己ベスト", f"{st.session_state.best_score}回")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("🏆 自己ベスト", f"{st.session_state.best_score}回")
+    with col2:
+        st.metric("📊 今回の試行", f"{st.session_state.count} 回")
+    st.write("---")
+
+    
     
 # 答えの数字を準備（まだなければ作成）
 if "target" not in st.session_state:
