@@ -41,7 +41,14 @@ if st.button("予想する"):
         else:
             st.warning("行き過ぎ！戻ってきて ⬇️")
     else:
-        st.success(f"大正解！天才かよ！ 🎉 {st.session_state.count}回目で正解しました！")
+        st.success(f"大正解！ 🎉 {st.session_state.count}回目で正解しました！")
+        # 回数によってメッセージをかえる
+        if st.session_state.count <= 8:
+            st.write("👽 天才かよ！もしかしてエスパー！？")
+        elif st.session_state.count <= 15:
+            st.write("👍 なかなかの勘だね！プロ級！")
+        else:
+            st.write("😅 どんまい！次はもっと早く当ててね！")
         st.balloons()
 
         # 今回のスコアがベストスコアより小さければ更新
