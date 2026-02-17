@@ -9,14 +9,15 @@ random.shuffle(card_values)
 
 # 2. ゲーム画面にカードを並べる
 def setup_game():
-    board = Element("game-board")
+    from pyscript import display
+    board = document.getElementById("game-board")
 
     # 10回繰り返してカードを作る
     for i in range(10):
         # HTMLの型を作成
         card_html= f'<div id="card-{i}" class="card" onclick="py_click({i})">?</div>'
         # 画面（game-board)に追加
-        board.element.innerHTML += card_html
+        board.innerHTML += card_html
 
 # 3. クリックしたときの「型」
 def py_click(index):
