@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>縄文神経衰弱</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <py-config>
+        [[fetch]]
+        files = ["./main.py"]
+    </py-config>
+    <style>
+        body { margin: 0; text-align: center; background-color: #f5f5dc; }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2列に並べる（スマホで見やすい） */
+            gap: 10px;
+            padding: 10px;
+            height: 100dvh; /* スマホピッタリの高さ */
+        }
+        .card {
+            background-color: #deb887;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board">
+        </div>
+    <py-script src="./main.py"></py-script>
+</body>
+</html>
