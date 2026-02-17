@@ -4,20 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>縄文神経衰弱</title>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
     <py-config>
         [[fetch]]
         files = ["./main.py"]
     </py-config>
+
     <style>
         body { margin: 0; text-align: center; background-color: #f5f5dc; }
         #game-board {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2列に並べる（スマホで見やすい） */
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             padding: 10px;
-            height: 100dvh; /* スマホピッタリの高さ */
+            height: 100dvh;
         }
         .card {
             background-color: #deb887;
@@ -27,6 +30,7 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            min-height: 100px; /* カードに高さを出す */
         }
     </style>
 </head>
