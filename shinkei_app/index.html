@@ -4,41 +4,49 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>縄文神経衰弱</title>
-    
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-
-    <py-config>
-        [[fetch]]
-        files = ["./main.py"]
-    </py-config>
-
     <style>
         body { margin: 0; text-align: center; background-color: #f5f5dc; }
-        #game-board {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 10px;
-            height: 100dvh;
-        }
-        .card {
-            background-color: #deb887;
-            border: 2px solid #8b4513;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            min-height: 100px; /* カードに高さを出す */
-        }
+        #game-board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+        .card { background-color: #deb887; border: 2px solid #8b4513; border-radius: 8px; 
+                display: flex; align-items: center; justify-content: center; 
+                font-size: 24px; min-height: 100px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="game-board">
-        </div>
-    <py-script src="./main.py"></py-script>
+    <h1>縄文神経衰弱</h1>
+    <div id="game-board"></div>
 
-    <script type="py" src="./main.py" async></script>
+    <script type="py">
+from pyscript import document
+import random
+
+# 1. データの準備
+card_values = ["A", "B", "C", "D", "E"] * 2
+random.shuffle(card_values)
+
+# 2. ゲーム画面にカードを並べる
+def setup_game():
+    board = document.getElementById("game-board")
+    for i in range(10):
+        # 直接HTML要素を作って追加する
+        card = document.createElement("div")
+        card.id = f"card-{i}"
+        card.className = "card"
+        card.innerText = "?"
+        # クリックイベントの設定
+        card.onclick = lambda e, idx=i: py_click(idx)
+        board.appendChild(card)
+
+# 3. クリックした時の処理
+def py_click(index):
+    card = document.getElementById(f"card-{index}")
+    card.innerText = card_values[index]
+    print(f"{index}番目を選択")
+
+# 実行
+setup_game()
+    </script>
 </body>
 </html>
