@@ -14,7 +14,7 @@ def setup_game():
     # 10回繰り返してカードを作る
     for i in range(10):
         # HTMLの型を作成
-        card_html= f'<div id="card"-{i}" class="card" onclick="py_click({i})">?</div>'
+        card_html= f'<div id="card-{i}" class="card" onclick="py_click({i})">?</div>'
         # 画面（game-board)に追加
         board.element.innerHTML += card_html
 
