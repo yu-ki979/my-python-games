@@ -4,49 +4,187 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>縄文神経衰弱</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2022.12.1/pyscript.css">
+    <script defer src="https://pyscript.net/releases/2022.12.1/pyscript.js"></script>
     <style>
-        body { margin: 0; text-align: center; background-color: #f5f5dc; }
-        #game-board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-        .card { background-color: #deb887; border: 2px solid #8b4513; border-radius: 8px; 
-                display: flex; align-items: center; justify-content: center; 
-                font-size: 24px; min-height: 100px; cursor: pointer; }
+        body { 
+            margin: 0; 
+            text-align: center; 
+            background-color: #f5f5dc; 
+            font-family: sans-serif; 
+        }
+
+        #game-board { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px;
+            padding: 20px;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .card { 
+            background-color: #deb887; 
+            border: 3px solid #8b4513; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 36px;
+            font-weight: bold;
+            aspect-ratio: 2 / 3;
+            cursor: pointer;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .card.matched {
+            background-color: #ffd700;
+            border-color: #daa520;
+            color:  #8b4513;
+            cursor: default;
+        }
+
+        .card img {
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
     <h1>縄文神経衰弱</h1>
+    <div id="stats" style="font-size: 20px; margin-bottom: 10px;">
+        お手つき: <span id="miss-count">0</span>回 |
+        タイム： <span id="timer">0</span>秒
+    </div>
+
+    <div id="message" style="font-size: 40px;
+    font-weight: bold;
+    color: #8b4513;
+    min-height: 1.5em;
+    margin: 10px 0;"> </div>
+
     <div id="game-board"></div>
 
-    <script type="py">
-from pyscript import document
+    <button onclick="location.reload()" style="margin-top: 20px;
+    padding: 10px 20px; 
+    font-size:18px; 
+    cursor:pointer; 
+    background-color:#8b4513; 
+    color:white; 
+    border-radius:8px; 
+    border:none;">もう１回</button>
+
+    <py-script>
+from pyscript import Element
 import random
+import asyncio # setTimeoutの代わりにPythonの非同期処理を使います
+import js
+import time
 
 # 1. データの準備
-card_values = ["A", "B", "C", "D", "E"] * 2
+images = ["img0.png", "img1.png", "img2.png", "img3.png", "img4.png", "img5.png"]
+card_values = images * 2
 random.shuffle(card_values)
 
-# 2. ゲーム画面にカードを並べる
+# 2. 状態管理
+flipped_indices = [] 
+lock_board = False   
+matched_count = 0
+miss_count = 0
+start_time = None
+is_playing = False
+
 def setup_game():
-    board = document.getElementById("game-board")
-    for i in range(10):
-        # 直接HTML要素を作って追加する
-        card = document.createElement("div")
+    global start_time, is_playing
+    start_time = None
+    is_playing = False
+
+    board_el = js.document.getElementById("game-board")
+    board_el.innerHTML = ""
+    
+    for i in range(12):
+        card = js.document.createElement("div")
         card.id = f"card-{i}"
         card.className = "card"
         card.innerText = "?"
-        # クリックイベントの設定
-        card.onclick = lambda e, idx=i: py_click(idx)
-        board.appendChild(card)
+        
+        # 非同期クリックイベントの設定
+        def on_click_handler(e, idx=i):
+            asyncio.ensure_future(py_click(idx))
+            
+        card.onclick = on_click_handler
+        board_el.appendChild(card)
+# タイムを更新し続ける関数
+async def update_timer():
+    global start_time, is_playing
+    while is_playing:
+        if start_time is not None:
+            elapsed = int(time.time() - start_time)
+            js.document.getElementById("timer").innerText = str(elapsed)
+        await asyncio.sleep(1) # 1秒ごとに更新
 
-# 3. クリックした時の処理
-def py_click(index):
-    card = document.getElementById(f"card-{index}")
-    card.innerText = card_values[index]
-    print(f"{index}番目を選択")
+async def py_click(index):
+    global lock_board, flipped_indices,\
+    matched_count, miss_count,\
+    start_time, is_playing    
+    card = js.document.getElementById(f"card-{index}")
+    
+    # 論理ガードを強化
+    # 1. ロック中 2. すでにめくられている 3. すでにそろっている
+    if lock_board or index in flipped_indices or card.classList.contains("matched"):
+        return
 
-# 実行
-setup_game()
-    </script>
+    # 最初の1枚をめくった瞬間にタイマースタート
+    if start_time is None:
+        start_time = time.time()
+        is_playing = True
+        asyncio.ensure_future(update_timer())
+
+    card.innerText = "" # 一旦 "?" を消す
+    img = js.document.createElement("img")
+    img.src = f"./images/{card_values[index]}"
+    img.style.width = "auto"   # 幅を自動に（枠に合わせるのではなく画像比率を優先）
+    img.style.height = "auto"  # 高さを自動に
+    img.style.maxWidth = "80%"  # 枠からはみ出さない
+    img.style.maxHeight = "80%" # 枠からはみ出さない
+    img.style.display = "block" # 隙間をなくす規律
+    card.appendChild(img)
+    
+    flipped_indices.append(index)
+
+    if len(flipped_indices) == 2:
+        lock_board = True 
+        idx1, idx2 = flipped_indices
+
+        if card_values[idx1] == card_values[idx2]:
+            # --- 一致した時の演出 ---
+            js.document.getElementById(f"card-{idx1}").classList.add("matched")
+            js.document.getElementById(f"card-{idx2}").classList.add("matched")
+            matched_count += 1
+            flipped_indices = []
+            lock_board = False
+
+            # --- 全部そろったかの判定 ---
+            if matched_count == 6:
+                is_playing = False # タイマー停止
+                await asyncio.sleep(0.3)
+                final_time = js.document.getElementById("timer").innerText
+                msg_el = js.document.getElementById("message")
+                msg_el.innerText = f"CLEAR!! 🎉"
+        else:
+            # --- 不一致 ---
+            # お手つきカウントアップ
+            miss_count += 1
+            js.document.getElementById("miss-count").innerText = str(miss_count)
+
+            # Pythonの標準機能で0.7秒待機
+            await asyncio.sleep(0.7)
+            js.document.getElementById(f"card-{idx1}").innerText = "?"
+            js.document.getElementById(f"card-{idx2}").innerText = "?"
+            flipped_indices = []
+            lock_board = False
+setup_game()    
+    </py-script>
 </body>
 </html>
