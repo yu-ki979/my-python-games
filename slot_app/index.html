@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JOMONスロット</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2022.12.1/pyscript.css">
+    <script defer src="https://pyscript.net/releases/2022.12.1/pyscript.js"></script>    
+    <style>
+        body {
+            margin: 0; padding: 20px;
+            text-align: center; background-color: #f5f5dc;
+            font-family: sans-serif;
+            overscroll-behavior: none; /* 引っ張って更新を防止 */
+        }
+
+        h1 { font-size: 1.8rem; color: #8b4513;}
+
+        #slot-container {
+            display: flex;
+            flex-direction: row; /* 絶対に縦並び */
+            flex-wrap:  nowrap; /* 絶対に折り返さない */
+            justify-content: center;
+            gap: 10px;
+            margin: 30px auto;
+            width: fit-content;
+        }
+
+        .reel-unit {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .reel {
+            width: 100px; height: 100px;
+            background-color: #fff;
+            border: 4px solid #8b4513;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .reel img {
+            max-width: 80%;
+            max-height: 80%;
+        }
+
+        .stop-btn {
+            width: 90px;
+            height: 45px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: #cd5c5c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 6px 0 #8b0000;
+            transition: all 0.1s;
+            -webkit-tap-height-color: transparent;
+        }
+
+        .stop-btn:active:not(:disabled) {
+            transform: translateY(4px); /* ボタンが沈む */
+            box-shadow: 0 2px 0 #8b0000;
+        }
+
+        .stop-btn:disabled {
+            background-color: #ccc;
+            box-shadow: 0 0 0 #999;
+            transform: translateY(4px);
+            cursor: default;
+        }
+
+        #spin-btn {
+            width: 150px; 
+            max-width: 300px;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #8b4513;
+            color: white;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 6px #5d2e0d;
+            margin-top:  20px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #spin-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #5d2e0d;
+        }
+
+        #spin-btn:disabled { background-color: #ccc; }
+
+        #result-message {
+            height: 1.5em;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #d2691e;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JOMOMスロット</h1>
+
+    <button id="spin-btn" py-click="spin()">START</button>
+
+    <div id="slot-container">
+        <div class="reel-unit">
+            <div id="reel-0" class="reel">？</div>
+            <button id="stop-0" class="stop-btn" py-click="stop_reel(0)" disabled>STOP</button>
+        </div>
+        <div class="reel-unit">
+            <div id="reel-1" class="reel">？</div>
+            <button id="stop-1" class="stop-btn" py-click="stop_reel(1)" disabled>STOP</button>
+        </div>
+        <div class="reel-unit">
+            <div id="reel-2" class="reel">？</div>
+            <button id="stop-2" class="stop-btn" py-click="stop_reel(2)" disabled>STOP</button>
+        </div>
+    </div>
+
+    <div id="result-message" style="font-size: 2rem; font-weight: bold; margin-top: 20px;"></div>
+
+    <py-script>
+import js
+import random
+import asyncio
+
+# 1. 画像リスト
+images = ["img0.png", "img1.png", "img2.png", "img3.png", "img4.png"]
+is_spinning = [False, False, False]
+results = [None, None, None]
+
+async def spin_logic(i):
+    # 各リールを個別に回し続ける関数
+    global is_spinning, results
+    while is_spinning[i]:
+        selected = random.choice(images)
+        reel = js.document.getElementById(f"reel-{i}")
+        reel.innerHTML = f'<img src="./images/{selected}">'
+        results[i] = selected
+        await asyncio.sleep(0.1) # 高速回転
+    
+async def spin():
+    global is_spinning
+    msg_el = js.document.getElementById("result-message")
+    msg_el.innerText = ""
+
+    js.document.getElementById("spin-btn").disabled = True
+
+    for i in range(3):
+        is_spinning[i] = True
+        js.document.getElementById(f"stop-{i}").disabled = False
+        asyncio.ensure_future(spin_logic(i))
+
+def stop_reel(i):
+    global is_spinning
+    if not is_spinning[i]: return # すでに止まっていれば何もしない
+
+    is_spinning[i] = False
+
+    js.document.getElementById(f"stop-{i}").disabled = True
+
+    # 3つとも止まったかチェック
+    if not any(is_spinning):
+        check_result()
+
+def check_result():
+    msg_el = js.document.getElementById("result-message")
+    js.document.getElementById("spin-btn").disabled = False
+
+    if results[0] == results[1] == results[2]:
+        msg_el.innerText = "JNOMON WIN!!! 🎉"
+        msg_el.style.color = "#ff4500"
+    else:
+        msg_el.innerText = "残念！！"
+        msg_el.style.color = "#8b4513"
+    </py-script>
+</body>
+</html>
