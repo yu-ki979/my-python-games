@@ -19,11 +19,11 @@
         #slot-container {
             display: flex;
             flex-direction: row; /* 絶対に縦並び */
-            flex-wrap:  nowrap; /* 絶対に折り返さない */
             justify-content: center;
+            align-items: flex-start; /* 縦の位置を揃える */
             gap: 10px;
-            margin: 30px auto;
-            width: fit-content;
+            margin: 20px auto; /* 左右autoで中央へ */
+            width: 100%; /* 幅をいっぱい使って中央寄せ */
         }
 
         .reel-unit {
@@ -34,11 +34,14 @@
         }
 
         .reel {
-            width: 100px; height: 100px;
+            width: 90px; height: 90px;
             background-color: #fff;
             border: 4px solid #8b4513;
             border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden; /* はみ出し防止 */
         }
 
         .reel img {
@@ -102,6 +105,14 @@
             font-weight: bold;
             color: #d2691e;
             margin-top: 20px;
+        }
+
+        #collection-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* スマホで横幅が足りない時に折り返す */
+            gap: 8px;
+            margin: 0 auto;
         }
 
         @keyframes bounce {
