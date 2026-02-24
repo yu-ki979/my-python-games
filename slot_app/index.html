@@ -1,231 +1,134 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JOMONスロット</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2022.12.1/pyscript.css">
     <script defer src="https://pyscript.net/releases/2022.12.1/pyscript.js"></script>    
     <style>
-        body {
-            margin: 0; padding: 20px;
-            text-align: center; background-color: #f5f5dc;
+        body { 
+            margin: 0; padding: 20px; 
+            text-align: center; background-color: #f5f5dc; 
             font-family: sans-serif;
-            overscroll-behavior: none; /* 引っ張って更新を防止 */
+            overflow-x: hidden;
         }
+        h1 { font-size: 1.5rem; color: #8b4513; margin: 10px 0; }
 
-        h1 { font-size: 1.8rem; color: #8b4513;}
-
-        #slot-container {
+        /* スロット枠を中央に固定 */
+        #slot-outer {
             display: flex;
             justify-content: center;
-            align-items: center; /* 縦の位置を揃える */
-            gap: 10px;
-            margin: 20px auto; /* 左右autoで中央へ */
-            width: max-content; /* 中身のサイズに合わせる */
-            max-width: 100%;    /* 画面からはみ出さないようにする */
+            width: 100%;
+            margin: 20px 0;
         }
-
-        .reel-unit {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .reel {
-            width: 90px; height: 90px;
-            background-color: #fff;
-            border: 4px solid #8b4513;
-            border-radius: 12px;
+        #slot-container { 
             display: flex; 
-            align-items: center; 
-            justify-content: center;
-            overflow: hidden; /* はみ出し防止 */
+            gap: 10px; 
+            flex-wrap: nowrap; /* 絶対に折り返さない */
         }
 
-        .reel img {
-            max-width: 80%;
-            max-height: 80%;
+        .reel-unit { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+
+        /* 枠の大きさを「絶対に」固定する設定 */
+        .reel { 
+            width: 90px; height: 90px; 
+            background: #fff; border: 4px solid #8b4513; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; /* 画面が狭くても潰さない */
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        /* 画像が枠を押し広げないように固定 */
+        .reel img { 
+            width: 80%; height: 80%; 
+            object-fit: contain; 
+            display: block;
         }
 
-        .reel-unit {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 0 0 auto; /* 勝手に伸び縮みさせない */
-        }
-
-        .stop-btn {
-            width: 90px;
-            height: 45px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            background: #cd5c5c;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 6px 0 #8b0000;
-            transition: all 0.1s;
-            -webkit-tap-height-color: transparent;
-        }
-
-        .stop-btn:active:not(:disabled) {
-            transform: translateY(4px); /* ボタンが沈む */
-            box-shadow: 0 2px 0 #8b0000;
-        }
-
-        .stop-btn:disabled {
-            background-color: #ccc;
-            box-shadow: 0 0 0 #999;
-            transform: translateY(4px);
-            cursor: default;
-        }
-
-        #spin-btn {
-            width: 150px; 
-            max-width: 300px;
-            padding: 20px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            background-color: #8b4513;
-            color: white;
-            border-radius: 50px;
-            border: none;
-            box-shadow: 0 6px #5d2e0d;
-            margin-top:  20px;
+        .stop-btn { 
+            width: 90px; height: 45px; 
+            background: #cd5c5c; color: white; border: none; border-radius: 10px; 
+            box-shadow: 0 4px 0 #8b0000; font-weight: bold; 
+            font-size: 1rem;
             -webkit-tap-highlight-color: transparent;
         }
+        .stop-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #8b0000; }
+        .stop-btn:disabled { background: #ccc; box-shadow: none; transform: translateY(4px); }
 
-        #spin-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px #5d2e0d;
-        }
-
-        #spin-btn:disabled { background-color: #ccc; }
-
-        #result-message {
-            height: 1.5em;
-            font-size: 2rem;
+        #spin-btn { 
+            padding: 15px 40px; font-size: 1.2rem; 
+            background: #8b4513; color: white; border-radius: 35px; 
+            border: none; box-shadow: 0 5px #5d2e0d; margin: 10px 0;
             font-weight: bold;
-            color: #d2691e;
-            margin-top: 20px;
+            -webkit-tap-highlight-color: transparent;
         }
+        #spin-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 3px #5d2e0d; }
 
-        #collection-icons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap; /* スマホで横幅が足りない時に折り返す */
-            gap: 8px;
-            margin: 0 auto;
+        /* コレクション棚 */
+        #collection-shelf { 
+            margin-top: 30px; padding: 15px; 
+            background: #e0d0b0; border-radius: 15px;
+            width: 100%; max-width: 320px;
+            margin-left: auto; margin-right: auto;
+            box-sizing: border-box;
         }
-
-        /* 小さい土偶枠用の設定を追加 */
-        .small-reel {
-            width: 50px !important; 
-            height: 50px !important; 
-            opacity: 0.2;
-            font-size: 0.8rem;
+        #collection-icons { 
+            display: flex; justify-content: center; gap: 5px; 
         }
-
-        @keyframes bounce {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
-        }
-
-        /* スマホでもPCでも確実に中央に寄せるための最終兵器 */
-        #slot-container {
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            width: max-content !important; /* 幅を中身に合わせるのがコツ */
-            max-width: 100%;
-            padding: 0;
-        }
-
-        #collection-icons {
-            display: flex !important;
-            justify-content: center !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-            margin: 10px auto !important;
-            width: 100% !important;
-        }
-
-        /* 念のためSTARTボタンも中央固定 */
-        #spin-btn {
-            display: block;
-            margin: 20px auto;
-        }
-
-        /* リールが画面からはみ出さないよう少し小さめに調整 */
-        .reel {
-            flex-shrink: 0; /* 潰れないようにする */
+        .small-reel { 
+            width: 50px !important; height: 50px !important; 
+            opacity: 0.2; font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
     <h1>JOMONスロット</h1>
-
+    
     <button id="spin-btn" py-click="spin()">START</button>
 
-    <div id="slot-container">
-        <div class="reel-unit">
-            <div id="reel-0" class="reel">？</div>
-            <button id="stop-0" class="stop-btn" py-click="stop_reel(0)" disabled>STOP</button>
-        </div>
-        <div class="reel-unit">
-            <div id="reel-1" class="reel">？</div>
-            <button id="stop-1" class="stop-btn" py-click="stop_reel(1)" disabled>STOP</button>
-        </div>
-        <div class="reel-unit">
-            <div id="reel-2" class="reel">？</div>
-            <button id="stop-2" class="stop-btn" py-click="stop_reel(2)" disabled>STOP</button>
+    <div id="slot-outer">
+        <div id="slot-container">
+            <div class="reel-unit">
+                <div id="reel-0" class="reel">？</div>
+                <button id="stop-0" class="stop-btn" py-click="stop_reel(0)" disabled>STOP</button>
+            </div>
+            <div class="reel-unit">
+                <div id="reel-1" class="reel">？</div>
+                <button id="stop-1" class="stop-btn" py-click="stop_reel(1)" disabled>STOP</button>
+            </div>
+            <div class="reel-unit">
+                <div id="reel-2" class="reel">？</div>
+                <button id="stop-2" class="stop-btn" py-click="stop_reel(2)" disabled>STOP</button>
+            </div>
         </div>
     </div>
 
-    <div id="result-message" style="font-size: 2rem; font-weight: bold; margin-top: 20px;"></div>
+    <div id="result-message" style="height:1.5em; font-size:1.5rem; font-weight:bold; color:#d2691e; margin:10px 0;"></div>
 
-    <div id="collection-shelf" style="margin-top: 30px; padding: 15px; background: #e0d0b0; border-radius: 10px;">
-        <p style="margin: 0 0 10px 0; font-weight: bold; color: #8b4513;">発掘済み土偶コレクション</p>
+    <div id="collection-shelf">
+        <p style="margin:0 0 10px 0; font-weight:bold; color:#8b4513;">発掘済み土偶コレクション</p>
         <div id="collection-icons">
             <div id="col-0" class="reel small-reel">？</div>
             <div id="col-1" class="reel small-reel">？</div>
             <div id="col-2" class="reel small-reel">？</div>
             <div id="col-3" class="reel small-reel">？</div>
             <div id="col-4" class="reel small-reel">？</div>
-        </div>        
-        <p id="complete-msg" style="color: #ff4500; font-weight: bold; margin-top: 15px; font-size: 2.5rem; text-shadow: 2px 2px 0 #fff; animation: bounce 0.5s infinite alternate; display: none;">
-        </p>
-        <button id="reset-btn" py-click="reset_game()" style="
-        margin-top: 15px;
-        padding: 10px 20px;
-        font-size: 1rem;
-        cursor: pointer;
-        background: #8b4513;
-        color: white;
-        border-radius: 8px;
-        border: none;
-        display: none; /* 最初は隠しておく */
-        font-weight: bold;
-        ">
-        記録をリセットして最初から遊ぶ
-        </button>
-    </div> 
+        </div>
+        <p id="complete-msg" style="display:none; color:red; font-size:1.2rem; font-weight:bold; margin-top:10px;">コンプリート！</p>
+        <button id="reset-btn" py-click="reset_game()" style="display:none; margin-top:10px; padding:5px 10px;">リセット</button>
+    </div>
+
     <audio id="snd-stop" src="./sounds/stop.mp3" preload="auto"></audio>
     <audio id="snd-reach" src="./sounds/reach.mp3" preload="auto" loop></audio>
     <audio id="snd-win" src="./sounds/win.mp3" preload="auto"></audio>
     <audio id="snd-miss" src="./sounds/miss.mp3" preload="auto"></audio>
     <audio id="snd-complete" src="./sounds/complete.mp3" preload="auto"></audio>
-    <py-config>
-    [[fetch]]
-    files = ["./main.py"]
-    </py-config>
 
+    <py-config>
+        [[fetch]]
+        files = ["./main.py"]
+    </py-config>
     <py-script src="./main.py"></py-script>
 </body>
 </html>
