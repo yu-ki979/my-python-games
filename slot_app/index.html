@@ -74,13 +74,20 @@
             box-sizing: border-box;
         }
         #collection-icons { 
-            display: flex; justify-content: center; gap: 5px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 4px;        /* 隙間をさらに狭く(8px→4px) */
+            width: 100%;
+            flex-wrap: nowrap; /* 【重要】絶対に2行にさせない */
         }
+        
         .small-reel { 
-            width: 50px !important; height: 50px !important; 
-            opacity: 0.2; font-size: 0.8rem;
-        }
-    </style>
+            width: 48px !important;  /* 少しだけサイズダウン */
+            height: 48px !important; 
+            flex-shrink: 1;          /* 画面が超狭い時は自動で少し縮むことを許可 */
+            opacity: 0.2; 
+            font-size: 0.8rem;
+        }    </style>
 </head>
 <body>
     <h1>JOMONスロット</h1>
