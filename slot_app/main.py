@@ -2,18 +2,28 @@ import js
 import random
 import asyncio
 
-def play_sound(filename):
-    audio = js.Audio.new(f"./sounds/{filename}")
-    audio.play()
-
 # 1. 画像リスト
 images = ["img0.png", "img1.png", "img2.png", "img3.png", "img4.png"]
 won_images = set() # 当たった画像を記録するセット
 is_spinning = [False, False, False]
 results = [None, None, None]
 
-reach_sound = js.Audio.new("./sounds/reach.mp3")
-reach_sound.loop = True # リピート再生を有効に
+# --- 音を鳴らす新しい関数 ---
+def play_sound(sound_id):
+    el = js.document.getElementById(f"snd-{sound_id}")
+    if el:
+        el.currentTime = 0
+        el.play()
+
+# --- リーチ音専用（再生・停止） ---
+def control_reach(action):
+    el = js.document.getElementById("snd-reach")
+    if el:
+        if action == "play":
+            el.play()
+        else:
+            el.pause()
+            el.currentTime = 0
 
 async def spin_logic(i):
     # 各リールを個別に回し続ける関数
@@ -26,14 +36,17 @@ async def spin_logic(i):
         await asyncio.sleep(0.2) # 高速回転
     
 async def spin():
-    # スマホの音出しロックを解除するための儀式
-    reach_sound.play()
-    reach_sound.pause()
+    # --- スマホのロック解除の儀式 ---    
+    for s in ["stop", "reach", "win", "miss", "complete"]:
+        el = js.document.getElementById(f"snd-{s}")
+        if el:
+            el.play()
+            el.pause()
+    
     global is_spinning
     msg_el = js.document.getElementById("result-message")
     msg_el.innerText = ""
-
-    js.document.getElementById("spin-btn").disabled = True
+    js.document.getElementById("spin-btn").disabled = True    
 
     for i in range(3):
         is_spinning[i] = True
@@ -54,8 +67,7 @@ def stop_reel(i):
         # 止まっているリールのインデックスを探す
         stopped_indices = [idx for idx, s in enumerate(is_spinning) if not s]
         if results[stopped_indices[0]] == results[stopped_indices[1]]:
-            reach_sound.play() # リーチ音をリピート再生
-
+            control_reach.play() # リーチ音をリピート再生
             # まだ回っている最後のリールを探して光らせる
             active_idx = is_spinning.index(True)
             js.document.getElementById(f"reel-{active_idx}").style.borderColor = "#ff4500"
@@ -64,8 +76,7 @@ def stop_reel(i):
     # 3つとも止まったかチェック
     if not any(is_spinning):
         # リーチ音を止める
-        reach_sound.pause()
-        reach_sound.currentTime = 0 # 再生位置を最初に戻す
+        control_reach("stop") # 全て止まったらリーチ音を消す        check_result()
         check_result()
 
     play_sound("stop.mp3") # ボタンを押した瞬間に鳴らす
@@ -126,10 +137,7 @@ async def flash_effect():
 def reset_game():
     global won_images
     won_images.clear()
-
-    # リーチ音を止める
-    reach_sound.pause()
-    reach_sound.currentTime = 0
+    control_reach("stop")
 
     # 棚の初期化（見た目を「？」に戻す）
     for i in range(len(images)):
@@ -141,3 +149,4 @@ def reset_game():
     js.document.getElementById("complete-msg").style.display = "none"
     js.document.getElementById("reset-btn").style.display = "none"
     js.document.getElementById("result-message").innerText = "リセット完了"
+
