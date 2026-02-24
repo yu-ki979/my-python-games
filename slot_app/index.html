@@ -134,6 +134,23 @@
             from { transform: scale(1); }
             to { transform: scale(1.1); }
         }
+
+        /* スマホでもPCでも確実に中央に寄せるための最終兵器 */
+        #slot-container, #collection-icons {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            width: 100% !important;
+            max-width: 100vw;
+            padding: 0;
+        }
+
+        /* リールが画面からはみ出さないよう少し小さめに調整 */
+        .reel {
+            flex-shrink: 0; /* 潰れないようにする */
+        }
     </style>
 </head>
 <body>
