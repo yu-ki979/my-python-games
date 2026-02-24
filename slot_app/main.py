@@ -26,6 +26,9 @@ async def spin_logic(i):
         await asyncio.sleep(0.2) # 高速回転
     
 async def spin():
+    # スマホの音出しロックを解除するための儀式
+    reach_sound.play()
+    reach_sound.pause()
     global is_spinning
     msg_el = js.document.getElementById("result-message")
     msg_el.innerText = ""
