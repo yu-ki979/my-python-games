@@ -10,10 +10,14 @@ results = [None, None, None]
 
 # --- 音を鳴らす新しい関数 ---
 def play_sound(sound_id):
-    el = js.document.getElementById(f"snd-{sound_id}")
-    if el:
-        el.currentTime = 0
-        el.play()
+    try:
+        el = js.document.getElementById(f"snd-{sound_id}")
+        if el:
+            el.currentTime = 0
+            el.play()
+    except Exception as e:
+        print(f"Sound error: {e}")
+
 
 # --- リーチ音専用（再生・停止） ---
 def control_reach(action):

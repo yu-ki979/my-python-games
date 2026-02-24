@@ -136,15 +136,30 @@
         }
 
         /* スマホでもPCでも確実に中央に寄せるための最終兵器 */
-        #slot-container, #collection-icons {
+        #slot-container {
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
             margin-left: auto !important;
             margin-right: auto !important;
-            width: 100% !important;
-            max-width: 100vw;
+            width: max-content !important; /* 幅を中身に合わせるのがコツ */
+            max-width: 100%;
             padding: 0;
+        }
+
+        #collection-icons {
+            display: flex !important;
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            margin: 10px auto !important;
+            width: 100% !important;
+        }
+
+        /* 念のためSTARTボタンも中央固定 */
+        #spin-btn {
+            display: block;
+            margin: 20px auto;
         }
 
         /* リールが画面からはみ出さないよう少し小さめに調整 */
