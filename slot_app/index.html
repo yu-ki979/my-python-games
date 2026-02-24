@@ -18,12 +18,12 @@
 
         #slot-container {
             display: flex;
-            flex-direction: row; /* 絶対に縦並び */
             justify-content: center;
-            align-items: flex-start; /* 縦の位置を揃える */
+            align-items: center; /* 縦の位置を揃える */
             gap: 10px;
             margin: 20px auto; /* 左右autoで中央へ */
-            width: 100%; /* 幅をいっぱい使って中央寄せ */
+            width: max-content; /* 中身のサイズに合わせる */
+            max-width: 100%;    /* 画面からはみ出さないようにする */
         }
 
         .reel-unit {
@@ -47,6 +47,13 @@
         .reel img {
             max-width: 80%;
             max-height: 80%;
+        }
+
+        .reel-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 0 auto; /* 勝手に伸び縮みさせない */
         }
 
         .stop-btn {
