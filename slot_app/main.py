@@ -71,7 +71,7 @@ def stop_reel(i):
         # 止まっているリールのインデックスを探す
         stopped_indices = [idx for idx, s in enumerate(is_spinning) if not s]
         if results[stopped_indices[0]] == results[stopped_indices[1]]:
-            control_reach.play() # リーチ音をリピート再生
+            control_reach("play") # リーチ音をリピート再生
             # まだ回っている最後のリールを探して光らせる
             active_idx = is_spinning.index(True)
             js.document.getElementById(f"reel-{active_idx}").style.borderColor = "#ff4500"
@@ -83,7 +83,7 @@ def stop_reel(i):
         control_reach("stop") # 全て止まったらリーチ音を消す        check_result()
         check_result()
 
-    play_sound("stop.mp3") # ボタンを押した瞬間に鳴らす
+    play_sound("stop") # ボタンを押した瞬間に鳴らす
 
 def check_result():
     msg_el = js.document.getElementById("result-message")
@@ -112,7 +112,7 @@ def check_result():
 
         # コンプリート判定
         if len(won_images) >= 5:
-            play_sound("complete.mp3")
+            play_sound("complete")
             comp_msg = js.document.getElementById("complete-msg")
             comp_msg.innerText = "全種類コンプリート！！ 🤩"  
             comp_msg.style.display = "block" # 念のため表示を確実にする  
@@ -120,10 +120,10 @@ def check_result():
             msg_el.innerText = "伝説の縄文マスター！"
         else:
             # 通常の当たりサウンド
-            play_sound("win.mp3")
+            play_sound("win")
             msg_el.innerText =  "JOMON WIN!!! 🎉"  
     else:
-        play_sound("miss.mp3")
+        play_sound("miss")
         msg_el.innerText = "残念！！"
         msg_el.style.color = "#8b4513"
 
